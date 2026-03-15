@@ -5,6 +5,9 @@ package com.groupadso.mini_market.Services;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+// este lo debo importar para que me sirva el LocalDate y poder hacer la busqueda en rango por fechas
+import java.time.LocalDate;
+
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -30,7 +33,7 @@ public class StaffService {
     private final RowMapper<StaffResponseDTO> staffMapper = (rs,rowNum)  ->{
         
         StaffResponseDTO staffResponseDTO = new StaffResponseDTO();
-        staffResponseDTO.setId(rs.getLong("id"));
+        staffResponseDTO.setId(rs.getLong("idEmpleado"));
         staffResponseDTO.setIdCard(rs.getString("idCard"));
         staffResponseDTO.setName(rs.getString("name"));
         staffResponseDTO.setCharge(rs.getString("charge"));
@@ -81,17 +84,42 @@ public class StaffService {
         return jdbctemplate.query(StaffRepository.GET_STAFFS, staffMapper);
     }
 
-    public StaffResponseDTO getStaff(Long id ){
-        return jdbctemplate.queryForObject(StaffRepository.GET_STAFF, staffMapper, id);
+    public StaffResponseDTO getStaff(Long idEmpleado ){
+        return jdbctemplate.queryForObject(StaffRepository.GET_STAFF, staffMapper, idEmpleado);
     }
 
-    public MessageResponseDTO deleteStaff(long id){
-        jdbctemplate.update(StaffRepository.DELETE_STAFF, id);
+    public MessageResponseDTO deleteStaff(long idEmpleado){
+        jdbctemplate.update(StaffRepository.DELETE_STAFF, idEmpleado);
 
         MessageResponseDTO response = new MessageResponseDTO();
         response.setMessage(MessageConstanst.MESSAGE_RESPONSE_DELETE_USER);
 
         return response;
+    }
+
+
+    // CONSULTA POR CARGO O POR FECHAS
+
+    public List<StaffResponseDTO> listarStaff(String charge, LocalDate startDate, LocalDate endDate){
+        if (charge != null && !charge.isEmpty()){
+            return jdbctemplate.query(
+                StaffRepository.GET_STAFF_BY_CHARGE,
+                staffMapper,
+                charge
+            );
+        }else if (startDate != null && endDate != null){
+            return jdbctemplate.query(
+                StaffRepository.GET_STAFF_BY_DATE_RANGE,
+                staffMapper,
+                java.sql.Date.valueOf(startDate),
+                java.sql.Date.valueOf(endDate));
+        }else {
+            // si no ponemos filtros nos va a devolver a todos los staff 
+            return jdbctemplate.query(
+                StaffRepository.GET_STAFFS, 
+                staffMapper);
+        }
+
     }
 
 

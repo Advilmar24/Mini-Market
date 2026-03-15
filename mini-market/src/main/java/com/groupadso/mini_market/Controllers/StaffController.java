@@ -43,17 +43,17 @@ public class StaffController {
         return ResponseEntity.status(HttpStatus.FOUND).body(response);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{idEmpleado}")
     public ResponseEntity<StaffResponseDTO> getStaff(@PathVariable Long id){
         StaffResponseDTO response = staffService.getStaff(id);
         return ResponseEntity.status(HttpStatus.FOUND).body(response);
 
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{idEmpleado}")
 
-    public ResponseEntity<MessageResponseDTO> deleteStaff(@PathVariable Long id){
-        MessageResponseDTO response = staffService.deleteStaff(id);
+    public ResponseEntity<MessageResponseDTO> deleteStaff(@PathVariable Long idEmpleado){
+        MessageResponseDTO response = staffService.deleteStaff(idEmpleado);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
