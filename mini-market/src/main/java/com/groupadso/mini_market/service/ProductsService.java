@@ -1,0 +1,195 @@
+package com.groupadso.mini_market.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
+import com.groupadso.mini_market.dto.CategoryResponseDTO;
+import com.groupadso.mini_market.dto.CategoryRequestDTO;
+import com.groupadso.mini_market.dto.HttpGlobalResponse;
+import com.groupadso.mini_market.dto.MessageResponseDTO;
+import com.groupadso.mini_market.dto.ProductsRequestDTO;
+import com.groupadso.mini_market.dto.ProductsResponseDTO;
+import com.groupadso.mini_market.entity.Category;
+import com.groupadso.mini_market.entity.Products;
+import com.groupadso.mini_market.repository.CategoryRepository;
+import com.groupadso.mini_market.repository.ProductsRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ProductsService {
+    private final ProductsRepository productsRepository;
+    private final CategoryRepository categoryRepository;
+
+    public MessageResponseDTO createProduct(ProductsRequestDTO request){
+        MessageResponseDTO response = new MessageResponseDTO();
+
+        // Validar que la categoría exista
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + request.getCategoryId()));
+
+        Products products = new Products();
+        products.setName(request.getName());
+        products.setPrice(request.getPrice());
+        products.setQuantity(request.getQuantity());
+        products.setCategory(category);
+
+        String barcode = generatedBarcode();
+
+        if (productsRepository.existsByBarcode(barcode)) {
+            throw new RuntimeException("El codigo de barras ya existe");
+        }
+
+        products.setBarcode(barcode);
+
+        try {
+             productsRepository.save(products);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException("Error, codigo de barra duplicado");
+        }
+        
+        response.setMessage("Producto creado correctamente. Barcode " + barcode);
+        return response;
+    }
+
+    private String generatedBarcode(){
+        return UUID.randomUUID().toString();
+    }
+
+    public HttpGlobalResponse<List<ProductsResponseDTO>> listProduct(){
+        List<ProductsResponseDTO> response = new ArrayList<>();
+        HttpGlobalResponse<List<ProductsResponseDTO>> responseProduct = new HttpGlobalResponse<>();
+        List<Products> products = productsRepository.findAll();
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No hay productos para mostrar");
+        }
+
+        for(Products product : products){
+            ProductsResponseDTO item = new ProductsResponseDTO();
+
+            item.setId(product.getId());
+            item.setName(product.getName());
+            item.setPrice(product.getPrice());
+            item.setQuantity(product.getQuantity());
+            item.setBarcode(product.getBarcode());
+            response.add(item);
+        }
+
+        responseProduct.setMessage("Productos encontrados.");
+        responseProduct.setData(response);
+
+        return responseProduct;
+    }
+
+    public ProductsResponseDTO getProductById(Long id){
+        Products product = productsRepository.findById(id).orElseThrow(()-> new RuntimeException("Producto no encontrado"));
+
+        ProductsResponseDTO response = new ProductsResponseDTO();
+        response.setId(product.getId());
+        response.setName(product.getName());
+        response.setPrice(product.getPrice());
+        response.setQuantity(product.getQuantity());
+        response.setBarcode(product.getBarcode());
+        return response;
+    }
+
+    public MessageResponseDTO updateProduct(Long id, ProductsRequestDTO request){
+        Products product = productsRepository.findById(id).orElseThrow(()-> new RuntimeException("Producto no encontrado"));
+
+        product.setName(request.getName());
+        product.setPrice(request.getPrice());
+        product.setQuantity(request.getQuantity());
+
+        productsRepository.save(product);
+
+        MessageResponseDTO response = new MessageResponseDTO();
+        response.setMessage("Producto actualizado correctamente");
+        
+        return response;
+    }
+
+    public MessageResponseDTO deleteProduct(Long id){
+        Products product = productsRepository.findById(id).orElseThrow(()-> new RuntimeException("Producto no encontrado."));
+
+        productsRepository.delete(product);
+
+        MessageResponseDTO response = new MessageResponseDTO();
+        response.setMessage("Producto eliminado correctamente");
+
+        return response;
+    }
+
+    public CategoryResponseDTO getCategoryById(Long id){
+        Category category = categoryRepository.findById(id).orElseThrow(()-> new RuntimeException("Categoría no encontrada"));
+
+        CategoryResponseDTO response = new CategoryResponseDTO();
+        response.setId(category.getId());
+        response.setName(category.getName());
+
+        List<ProductsResponseDTO> productsDTO =new ArrayList<>();
+
+        for (Products products : category.getProducts()){
+            ProductsResponseDTO dto = new ProductsResponseDTO();
+            dto.setId(products.getId());
+            dto.setName(products.getName());
+            dto.setPrice(products.getPrice());
+            dto.setQuantity(products.getQuantity());
+            dto.setBarcode(products.getBarcode());
+
+            productsDTO.add(dto);
+        }
+        response.setProducts(productsDTO);
+        return response;
+    }
+
+    public HttpGlobalResponse<List<ProductsResponseDTO>> getProductsByCategory(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + categoryId));
+
+        List<Products> productsList = productsRepository.findByCategory(category);
+
+        if (productsList.isEmpty()) {
+            throw new RuntimeException("No hay productos en esta categoría");
+        }
+
+        List<ProductsResponseDTO> response = new ArrayList<>();
+        for (Products product : productsList) {
+            ProductsResponseDTO dto = new ProductsResponseDTO();
+            dto.setId(product.getId());
+            dto.setName(product.getName());
+            dto.setPrice(product.getPrice());
+            dto.setQuantity(product.getQuantity());
+            dto.setBarcode(product.getBarcode());
+            response.add(dto);
+        }
+
+        HttpGlobalResponse<List<ProductsResponseDTO>> result = new HttpGlobalResponse<>();
+        result.setMessage("Productos de la categoría: " + category.getName());
+        result.setData(response);
+        return result;
+    }
+
+    public MessageResponseDTO createCategory(CategoryRequestDTO request) {
+        // Verificar si la categoría ya existe
+        // Nota: Se puede mejorar agregando un método findByName en CategoryRepository
+
+        Category category = new Category();
+        category.setName(request.getName());
+
+        try {
+            categoryRepository.save(category);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException("Error al crear la categoría");
+        }
+
+        MessageResponseDTO response = new MessageResponseDTO();
+        response.setMessage("Categoría creada correctamente: " + request.getName());
+        return response;
+    }
+}
