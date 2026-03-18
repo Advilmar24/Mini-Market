@@ -1,7 +1,10 @@
 package com.groupadso.mini_market.Controllers;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,11 +32,16 @@ public class StaffController {
         this.staffService = staffService;
     }
 
-    @PostMapping()
-    public ResponseEntity<StaffResponseDTO> createStaff(@RequestBody StaffRequestDTO staffRequestDTO){
-        StaffResponseDTO response = staffService.createStaff(staffRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+@PostMapping
+// Se agrega @Valid para activar la validación de los objetos StaffRequestDTO
+public ResponseEntity<List<StaffResponseDTO>> createStaff(@RequestBody @jakarta.validation.Valid List<StaffRequestDTO> staffList){
+    List<StaffResponseDTO> responses = new ArrayList<>();
+    for (StaffRequestDTO staff : staffList){
+        responses.add(staffService.createStaff(staff));
     }
+    return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+}
+
 
     @GetMapping()
 
@@ -57,5 +65,17 @@ public class StaffController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @GetMapping("/filter")
+public ResponseEntity<List<StaffResponseDTO>> listarStaff(
+        @RequestParam(required = false) String charge,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+    List<StaffResponseDTO> response = staffService.listarStaff(charge, startDate, endDate);
+    return ResponseEntity.ok(response);
+}
+
+
     
 }

@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Data;
 
+@Data
 //DTO lo que recibe del cliente al crear al personal
 public class StaffRequestDTO {
     // Esta anotacion me sirve para no dejar espacios vacios @NotBlank
@@ -31,45 +33,6 @@ public class StaffRequestDTO {
     @NotNull(message = "el Salario es OBLIGATORIO")
     private Double salary;
 
-    public String getIdCard() {
-        return idCard;
-    }
-
-    public void setIdCard(String idCard) {
-        this.idCard = idCard;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCharge() {
-        return charge;
-    }
-
-    public void setCharge(String charge) {
-        this.charge = charge;
-    }
-
-    public LocalDate getHireDate() {
-        return hireDate;
-    }
-
-    public void setHireDate(LocalDate hireDate) {
-        this.hireDate = hireDate;
-    }
-
-    public Double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Double salary) {
-        this.salary = salary;
-    }
 
 
     
