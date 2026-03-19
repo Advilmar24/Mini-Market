@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-MiniMarketApplication<mini-market>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.groupadso.mini_market.MiniMarketApplication",
+            "projectName": "mini-market",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+package com.groupadso.mini_market.DTO;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+
+
+class EntradaAlmacenRequestDTO {
+    @NotNull
+    private Long idProduct;
+    @NotNull
+    private Long idProveedor;
+    
+    @NotBlank(message = "Debes escribir la cantidad")
+    private Integer cantidad;
+
+    public Long getIdProduct() { 
+        return idProduct; }
+
+    public void setIdProduct(Long idProduct) {
+        this.idProduct = idProduct; }
+        
+    public Long getIdProveedor() { return idProveedor; }
+
+    public void setIdProveedor(Long idProveedor) { 
+        this.idProveedor = idProveedor; }
+
+    public Integer getCantidad() {
+        return cantidad; }
+    
+    public void setCantidad(Integer cantidad) { 
+        this.cantidad = cantidad; }
+
+}

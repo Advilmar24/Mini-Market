@@ -4,8 +4,8 @@ import com.groupadso.mini_market.DTO.MessageResponseDTO;
 import com.groupadso.mini_market.DTO.SuppliersResponseDTO;
 import com.groupadso.mini_market.DTO.SuppliersRequestDTO;
 import com.groupadso.mini_market.Repository.SuppliersRepository;
-import com.groupadso.mini_market.Constants.MessageConstanst;
-import java.util.List;
+import com.groupadso.mini_market.Constants.MessageConstants;
+
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -17,79 +17,85 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
-import com.groupadso.mini_market.DTO.MessageResponseDTO;
-import com.groupadso.mini_market.DTO.SuppliersResponseDTO;
-
 @Service
 public class SuppliersService {
-    private JdbcTemplate jdbctemplate;
+    private final JdbcTemplate jdbctemplate;
 
     public SuppliersService(JdbcTemplate jdbcTemplate){
         this.jdbctemplate = jdbcTemplate;
     }
 
-    private final RowMapper<SuppliersResponseDTO> suppliersMapper = (rs,rowNum)  ->{
-        
+    private final RowMapper<SuppliersResponseDTO> suppliersMapper = (rs, rowNum) -> {
         SuppliersResponseDTO suppliersResponseDTO = new SuppliersResponseDTO();
-        suppliersResponseDTO.setId(rs.getLong("idProveedor"));
+        suppliersResponseDTO.setIdProveedor(rs.getLong("idProveedor"));
         suppliersResponseDTO.setName(rs.getString("name"));
-        suppliersResponseDTO.setINT(rs.getString("INT"));
+        suppliersResponseDTO.setNit(rs.getString("nit"));
         suppliersResponseDTO.setPhone(rs.getString("phone"));
-        suppliersResponseDTO.setEmail(rs.getString("email"));
-        // Corrijo el nombre de la columna a 'address'
+        suppliersResponseDTO.setMail(rs.getString("mail"));
         suppliersResponseDTO.setAddress(rs.getString("address"));
         return suppliersResponseDTO;
     };
 
-
-    public SuppliersResponseDTO createSupplier(SuppliersRequestDTO suppliersRequestDTO ){
-        
+    public SuppliersResponseDTO createSupplier(SuppliersRequestDTO suppliersRequestDTO) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbctemplate.update(conecction ->{
-            PreparedStatement preparedStetament= conecction.prepareStatement(
+        jdbctemplate.update(connection -> {
+            PreparedStatement preparedStatement = connection.prepareStatement(
                 SuppliersRepository.INSERT_SUPPLIER,
                 Statement.RETURN_GENERATED_KEYS);
 
-            preparedStetament.setString(1, suppliersRequestDTO.getName());
-            preparedStetament.setString(2, suppliersRequestDTO.getINT());
-            preparedStetament.setString(3, suppliersRequestDTO.getPhone());
-            preparedStetament.setString(4, suppliersRequestDTO.getEmail());
-            preparedStetament.setString(5, suppliersRequestDTO.getAddress());
+            preparedStatement.setString(1, suppliersRequestDTO.getName());
+            preparedStatement.setString(2, suppliersRequestDTO.getNit());
+            preparedStatement.setString(3, suppliersRequestDTO.getPhone());
+            preparedStatement.setString(4, suppliersRequestDTO.getMail());
+            preparedStatement.setString(5, suppliersRequestDTO.getAddress());
 
-            return preparedStetament;
+            return preparedStatement;
         }, keyHolder);
 
         SuppliersResponseDTO response = new SuppliersResponseDTO();
-        // Prevengo posible NullPointerException
         if (keyHolder.getKey() != null) {
-            response.setId(keyHolder.getKey().longValue());
+            response.setIdProveedor(keyHolder.getKey().longValue());
         } else {
-            response.setId(null);
+            response.setIdProveedor(null);
         }
         response.setName(suppliersRequestDTO.getName());
-        response.setINT(suppliersRequestDTO.getINT());
+        response.setNit(suppliersRequestDTO.getNit());
         response.setPhone(suppliersRequestDTO.getPhone());
-        response.setEmail(suppliersRequestDTO.getEmail());
+        response.setMail(suppliersRequestDTO.getMail());
         response.setAddress(suppliersRequestDTO.getAddress());
 
         return response;
     }
 
-    public List<SuppliersResponseDTO> getSuppliers(){
+    public List<SuppliersResponseDTO> getSuppliers() {
         return jdbctemplate.query(SuppliersRepository.GET_SUPPLIERS, suppliersMapper);
     }
 
-    public SuppliersResponseDTO getSupplier(Long idProveedor ){
+    public SuppliersResponseDTO getSupplier(Long idProveedor) {
         return jdbctemplate.queryForObject(SuppliersRepository.GET_SUPPLIER, suppliersMapper, idProveedor);
     }
 
-    public MessageResponseDTO deleteSupplier(long idProveedor){
+    public MessageResponseDTO deleteSupplier(long idProveedor) {
         jdbctemplate.update(SuppliersRepository.DELETE_SUPPLIER, idProveedor);
 
         MessageResponseDTO response = new MessageResponseDTO();
-        response.setMessage(MessageConstanst.MESSAGE_RESPONSE_DELETE_USER);
+        response.setMessage(MessageConstants.MESSAGE_RESPONSE_DELETE_USER);
 
         return response;
     }
+
+    /*public class WarehouseService {
+
+    public boolean entradaAlmacen(Long idProducto, Long idProveedor, Integer cantidad) {
+        // Aquí va la lógica real para actualizar el stock en la base de datos.
+        // Por ahora, devolvemos true como ejemplo para que compile y funcione.
+        System.out.println("Actualizando stock: producto=" + idProducto +
+                            ", proveedor=" + idProveedor +
+                            ", cantidad=" + cantidad);
+        
+                                            return true;
+    }
+
+}*/
 }
