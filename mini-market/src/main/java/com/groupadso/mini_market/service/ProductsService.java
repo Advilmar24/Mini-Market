@@ -33,6 +33,11 @@ public class ProductsService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + request.getCategoryId()));
 
+                if (productsRepository.existsByNameIgnoreCaseAndCategory(request.getName().trim(), category)) {
+                    throw new RuntimeException("Ya existe un producto con el mismo nombre en esta categoría");
+                    
+                }
+
         Products products = new Products();
         products.setName(request.getName());
         products.setPrice(request.getPrice());
@@ -40,10 +45,6 @@ public class ProductsService {
         products.setCategory(category);
 
         String barcode = generatedBarcode();
-
-        if (productsRepository.existsByBarcode(barcode)) {
-            throw new RuntimeException("El codigo de barras ya existe");
-        }
 
         products.setBarcode(barcode);
 

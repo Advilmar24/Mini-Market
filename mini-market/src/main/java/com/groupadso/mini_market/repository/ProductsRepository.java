@@ -16,5 +16,7 @@ public interface ProductsRepository extends JpaRepository <Products, Long> {
 
     boolean existsByBarcode(String barcode);
 
+    boolean existsByNameIgnoreCaseAndCategory(String name, Category category);
+
     List<Products> findByCategory(Category category);
 }
