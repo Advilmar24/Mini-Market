@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.groupadso.mini_market.dto.CategoryRequestDTO;
-import com.groupadso.mini_market.dto.CategoryResponseDTO;
-import com.groupadso.mini_market.dto.HttpGlobalResponse;
-import com.groupadso.mini_market.dto.MessageResponseDTO;
-import com.groupadso.mini_market.dto.ProductsResponseDTO;
+import com.groupadso.mini_market.dto.RequestDTO.CategoryRequestDTO;
+import com.groupadso.mini_market.dto.ResponseDTO.CategoryResponseDTO;
+import com.groupadso.mini_market.dto.ResponseDTO.HttpGlobalResponse;
+import com.groupadso.mini_market.dto.ResponseDTO.MessageResponseDTO;
+import com.groupadso.mini_market.dto.ResponseDTO.ProductsResponseDTO;
 import com.groupadso.mini_market.service.ProductsService;
 
 import jakarta.validation.Valid;

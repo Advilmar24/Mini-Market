@@ -1,4 +1,4 @@
-package com.groupadso.mini_market.dto;
+package com.groupadso.mini_market.dto.ResponseDTO;
 
 import java.util.List;
 

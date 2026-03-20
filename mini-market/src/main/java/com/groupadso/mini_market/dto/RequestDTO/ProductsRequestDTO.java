@@ -1,4 +1,4 @@
-package com.groupadso.mini_market.dto;
+package com.groupadso.mini_market.dto.RequestDTO;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
