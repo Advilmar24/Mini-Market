@@ -2,7 +2,7 @@ package com.groupadso.mini_market.DTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+
 
 
 public class SuppliersRequestDTO {
