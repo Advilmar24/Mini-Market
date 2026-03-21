@@ -1,5 +1,7 @@
 package com.groupadso.mini_market.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -116,12 +118,15 @@ public class ProductsService {
     }
 
     public MessageResponseDTO deleteProduct(Long id){
-        Products product = productsRepository.findById(id).orElseThrow(()-> new RuntimeException("Producto no encontrado."));
+        Products product = productsRepository.findByIdAndStatusTrue(id).orElseThrow(()-> new RuntimeException("Producto no encontrado."));
 
-        productsRepository.delete(product);
+        product.setStatus(false); //BORRADO LOGICO
+        product.setDeletedAt(LocalDateTime.now());   
+
+        productsRepository.save(product);
 
         MessageResponseDTO response = new MessageResponseDTO();
-        response.setMessage("Producto eliminado correctamente");
+        response.setMessage("Producto eliminado correctamente (Borrado lógico)");
 
         return response;
     }

@@ -1,5 +1,7 @@
 package com.groupadso.mini_market.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +26,12 @@ public class Products {
 
     @Column (name = "price")
     private double price;
+
+    @Column(name = "status")
+    private boolean status = true;
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
 
     @Column (name = "cantidad")
     private int quantity;
