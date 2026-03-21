@@ -80,6 +80,30 @@ public class StaffService {
         return response;
     }
 
+    public StaffResponseDTO updateStaff(Long idEmpleado, StaffRequestDTO staffRequestDTO) {
+    jdbctemplate.update(con -> {
+        PreparedStatement ps = con.prepareStatement(StaffRepository.UPDATE_STAFF);
+        ps.setString(1, staffRequestDTO.getIdCard());
+        ps.setString(2, staffRequestDTO.getName());
+        ps.setString(3, staffRequestDTO.getCharge());
+        ps.setDate(4, java.sql.Date.valueOf(staffRequestDTO.getHireDate()));
+        ps.setDouble(5, staffRequestDTO.getSalary());
+        ps.setLong(6, idEmpleado);
+        return ps;
+    });
+
+    StaffResponseDTO response = new StaffResponseDTO();
+    response.setId(idEmpleado);
+    response.setIdCard(staffRequestDTO.getIdCard());
+    response.setName(staffRequestDTO.getName());
+    response.setCharge(staffRequestDTO.getCharge());
+    response.setHireDate(staffRequestDTO.getHireDate());
+    response.setSalary(staffRequestDTO.getSalary());
+
+    return response;
+}
+
+
     public List<StaffResponseDTO> getStaff(){
         return jdbctemplate.query(StaffRepository.GET_STAFFS, staffMapper);
     }

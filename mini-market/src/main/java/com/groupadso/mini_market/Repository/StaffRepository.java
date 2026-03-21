@@ -8,6 +8,9 @@ public class StaffRepository {
 
     public static final String GET_STAFF = "SELECT * FROM personal WHERE idEmpleado = ?";
 
+    public static final String UPDATE_STAFF =
+    "UPDATE personal SET idCard = ?, name = ?, charge = ?, hireDate = ?, salary = ? WHERE idEmpleado = ?";
+
     public static final String DELETE_STAFF = "DELETE FROM personal WHERE idEmpleado = ?";
     
     // En esta consulta los lista por Cargo
