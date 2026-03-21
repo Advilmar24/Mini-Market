@@ -1,6 +1,5 @@
 package com.groupadso.mini_market.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
