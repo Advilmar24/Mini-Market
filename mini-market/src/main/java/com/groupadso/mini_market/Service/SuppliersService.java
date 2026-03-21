@@ -84,18 +84,4 @@ public class SuppliersService {
 
         return response;
     }
-
-    /*public class WarehouseService {
-
-    public boolean entradaAlmacen(Long idProducto, Long idProveedor, Integer cantidad) {
-        // Aquí va la lógica real para actualizar el stock en la base de datos.
-        // Por ahora, devolvemos true como ejemplo para que compile y funcione.
-        System.out.println("Actualizando stock: producto=" + idProducto +
-                            ", proveedor=" + idProveedor +
-                            ", cantidad=" + cantidad);
-        
-                                            return true;
-    }
-
-}*/
 }
