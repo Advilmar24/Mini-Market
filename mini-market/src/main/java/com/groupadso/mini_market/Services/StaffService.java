@@ -101,27 +101,42 @@ public class StaffService {
     // CONSULTA POR CARGO O POR FECHAS
 
     public List<StaffResponseDTO> listarStaff(String charge, LocalDate startDate, LocalDate endDate){
-        if (charge != null && !charge.isEmpty()){
-            return jdbctemplate.query(
-                StaffRepository.GET_STAFF_BY_CHARGE,
-                staffMapper,
-                charge
-            );
-        }else if (startDate != null && endDate != null){
-            return jdbctemplate.query(
-                StaffRepository.GET_STAFF_BY_DATE_RANGE,
-                staffMapper,
-                java.sql.Date.valueOf(startDate),
-                java.sql.Date.valueOf(endDate));
-        }else {
-            // si no ponemos filtros nos va a devolver a todos los staff 
-            return jdbctemplate.query(
-                StaffRepository.GET_STAFFS, 
-                staffMapper);
-        }
+    if (charge != null && !charge.isEmpty() && startDate != null && endDate != null){
+        // Filtro combinado: cargo + fechas
+        return jdbctemplate.query(
+            StaffRepository.GET_STAFF_BY_CHARGE_AND_DATE_RANGE,
+            staffMapper,
+            charge,
+            java.sql.Date.valueOf(startDate),
+            java.sql.Date.valueOf(endDate)
+        );
+    } else if (charge != null && !charge.isEmpty()){
+        // Solo cargo
+        return jdbctemplate.query(
+            StaffRepository.GET_STAFF_BY_CHARGE,
+            staffMapper,
+            charge
+        );
+    } else if (startDate != null && endDate != null){
+        // Solo fechas
+        return jdbctemplate.query(
+            StaffRepository.GET_STAFF_BY_DATE_RANGE,
+            staffMapper,
+            java.sql.Date.valueOf(startDate),
+            java.sql.Date.valueOf(endDate)
+        );
+    } else {
+        // Sin filtros
+        return jdbctemplate.query(
+            StaffRepository.GET_STAFFS,
+            staffMapper
+        );
+    }
+}
+
 
     }
 
 
     
-}
+

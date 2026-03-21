@@ -15,4 +15,7 @@ public class StaffRepository {
 
     // En esta consulta por Rango de Fechas
     public static final String GET_STAFF_BY_DATE_RANGE = "SELECt * FROM personal WHERE hireDate BETWEEN ? AND ?";
+
+    // en esta consulta por cargo y rango de fechas
+    public static final String GET_STAFF_BY_CHARGE_AND_DATE_RANGE = "SELECT * FROM personal WHERE charge = ? AND hireDate BETWEEN ? AND ?";
 }

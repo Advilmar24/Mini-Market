@@ -52,8 +52,8 @@ public ResponseEntity<List<StaffResponseDTO>> createStaff(@RequestBody @jakarta.
     }
 
     @GetMapping("/{idEmpleado}")
-    public ResponseEntity<StaffResponseDTO> getStaff(@PathVariable Long id){
-        StaffResponseDTO response = staffService.getStaff(id);
+    public ResponseEntity<StaffResponseDTO> getStaff(@PathVariable ("idEmpleado") Long idEmpleado){
+        StaffResponseDTO response = staffService.getStaff(idEmpleado);
         return ResponseEntity.status(HttpStatus.FOUND).body(response);
 
     }
