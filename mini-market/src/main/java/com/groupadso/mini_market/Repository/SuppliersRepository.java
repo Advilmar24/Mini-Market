@@ -6,6 +6,9 @@ public class SuppliersRepository {
 
     public static final String GET_SUPPLIERS = "SELECT * FROM proveedores";
 
+    public static final String UPDATE_SUPPLIER =
+    "UPDATE proveedores SET name = ?, phone = ?, mail = ?, address = ? WHERE idProveedor = ?";
+
     public static final String GET_SUPPLIER = "SELECT * FROM proveedores WHERE idProveedor = ?";
 
     public static final String DELETE_SUPPLIER = "DELETE FROM proveedores WHERE idProveedor = ?";

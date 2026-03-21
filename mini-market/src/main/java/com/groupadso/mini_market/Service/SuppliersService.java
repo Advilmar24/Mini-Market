@@ -68,6 +68,29 @@ public class SuppliersService {
         return response;
     }
 
+
+    public SuppliersResponseDTO updateSupplier(Long idProveedor, SuppliersRequestDTO suppliersRequestDTO) {
+
+        jdbctemplate.update(con -> {
+        PreparedStatement ps = con.prepareStatement(SuppliersRepository.UPDATE_SUPPLIER);
+        ps.setString(1, suppliersRequestDTO.getName());
+        ps.setString(2, suppliersRequestDTO.getPhone());
+        ps.setString(3, suppliersRequestDTO.getMail());
+        ps.setString(4, suppliersRequestDTO.getAddress());
+        ps.setLong(5, idProveedor);
+        return ps;
+    });
+
+    SuppliersResponseDTO response = new SuppliersResponseDTO();
+    response.setIdProveedor(idProveedor);
+    response.setName(suppliersRequestDTO.getName());
+    response.setPhone(suppliersRequestDTO.getPhone());
+    response.setMail(suppliersRequestDTO.getMail());
+    response.setAddress(suppliersRequestDTO.getAddress());
+
+    return response;
+}
+
     public List<SuppliersResponseDTO> getSuppliers() {
         return jdbctemplate.query(SuppliersRepository.GET_SUPPLIERS, suppliersMapper);
     }
