@@ -1,165 +1,53 @@
 package com.groupadso.mini_market.Services;
 
-
-
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.List;
-// este lo debo importar para que me sirva el LocalDate y poder hacer la busqueda en rango por fechas
-import java.time.LocalDate;
-
-
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
-
-import com.groupadso.mini_market.Constants.MessageConstanst;
-import com.groupadso.mini_market.DTO.MessageResponseDTO;
-import com.groupadso.mini_market.DTO.StaffRequestDTO;
-import com.groupadso.mini_market.DTO.StaffResponseDTO;
+import java.time.LocalDate;
+import java.util.List;
 import com.groupadso.mini_market.Repository.StaffRepository;
+import com.groupadso.mini_market.Entity.StaffEntity;
 
 @Service
 public class StaffService {
 
-    private JdbcTemplate jdbctemplate;
+    private final StaffRepository staffRepository;
 
-    public StaffService(JdbcTemplate jdbcTemplate){
-        this.jdbctemplate = jdbcTemplate;
+    public StaffService(StaffRepository staffRepository) {
+        this.staffRepository = staffRepository;
     }
 
-    private final RowMapper<StaffResponseDTO> staffMapper = (rs,rowNum)  ->{
-        
-        StaffResponseDTO staffResponseDTO = new StaffResponseDTO();
-        staffResponseDTO.setId(rs.getLong("idEmpleado"));
-        staffResponseDTO.setIdCard(rs.getString("idCard"));
-        staffResponseDTO.setName(rs.getString("name"));
-        staffResponseDTO.setCharge(rs.getString("charge"));
-
-        // Como LocalDate es mas moderno por que esta fue introducida en JAVA 8, esta es mas clara y segura por que no mescla la fecha con la hora
-        //JDBC espera un Java,sql.Date, porque JDBC fue creado antes que existiera LocalDate
-        //Al leer: java.sql.Date -> LocalDate con .toLocalDate().
-        staffResponseDTO.setHireDate(rs.getDate("hireDate").toLocalDate());
-        staffResponseDTO.setSalary(rs.getDouble("salary"));
-        return staffResponseDTO;
-    };
-
-
-    public StaffResponseDTO createStaff(StaffRequestDTO staffRequestDTO ){
-        
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        jdbctemplate.update(conecction ->{
-
-            PreparedStatement preparedStetament= conecction.prepareStatement(
-                StaffRepository.INSERT_STAFF,
-                Statement.RETURN_GENERATED_KEYS);
-
-                preparedStetament.setString(1, staffRequestDTO.getIdCard());
-                preparedStetament.setString(2, staffRequestDTO.getName());
-                preparedStetament.setString(3, staffRequestDTO.getCharge());
-
-                //Al guardar: LocalDate -> java.sql.Date con valueOf().
-                //java.sql.Date.valueOf(LocalDate) es el puente oficial entre ambas APIs
-                preparedStetament.setDate(4, java.sql.Date.valueOf(staffRequestDTO.getHireDate()));
-                preparedStetament.setDouble(5, staffRequestDTO.getSalary());
-
-                return preparedStetament;
-        }, keyHolder);
-
-        StaffResponseDTO response = new StaffResponseDTO();
-        response.setId(keyHolder.getKey().longValue());
-        response.setIdCard(staffRequestDTO.getIdCard());
-        response.setName(staffRequestDTO.getName());
-        response.setCharge(staffRequestDTO.getCharge());
-        response.setHireDate(staffRequestDTO.getHireDate());
-        response.setSalary(staffRequestDTO.getSalary());
-
-        return response;
+    public StaffEntity createStaff(StaffEntity staff) {
+        return staffRepository.save(staff);
     }
 
-    public StaffResponseDTO updateStaff(Long idEmpleado, StaffRequestDTO staffRequestDTO) {
-    jdbctemplate.update(con -> {
-        PreparedStatement ps = con.prepareStatement(StaffRepository.UPDATE_STAFF);
-        ps.setString(1, staffRequestDTO.getIdCard());
-        ps.setString(2, staffRequestDTO.getName());
-        ps.setString(3, staffRequestDTO.getCharge());
-        ps.setDate(4, java.sql.Date.valueOf(staffRequestDTO.getHireDate()));
-        ps.setDouble(5, staffRequestDTO.getSalary());
-        ps.setLong(6, idEmpleado);
-        return ps;
-    });
-
-    StaffResponseDTO response = new StaffResponseDTO();
-    response.setId(idEmpleado);
-    response.setIdCard(staffRequestDTO.getIdCard());
-    response.setName(staffRequestDTO.getName());
-    response.setCharge(staffRequestDTO.getCharge());
-    response.setHireDate(staffRequestDTO.getHireDate());
-    response.setSalary(staffRequestDTO.getSalary());
-
-    return response;
-}
-
-
-    public List<StaffResponseDTO> getStaff(){
-        return jdbctemplate.query(StaffRepository.GET_STAFFS, staffMapper);
+    public StaffEntity updateStaff(Long idEmpleado, StaffEntity staffRequest) {
+        staffRequest.setIdEmpleado(idEmpleado);
+        return staffRepository.save(staffRequest);
     }
 
-    public StaffResponseDTO getStaff(Long idEmpleado ){
-        return jdbctemplate.queryForObject(StaffRepository.GET_STAFF, staffMapper, idEmpleado);
+    public List<StaffEntity> getStaff() {
+        return staffRepository.findAll();
     }
 
-    public MessageResponseDTO deleteStaff(long idEmpleado){
-        jdbctemplate.update(StaffRepository.DELETE_STAFF, idEmpleado);
-
-        MessageResponseDTO response = new MessageResponseDTO();
-        response.setMessage(MessageConstanst.MESSAGE_RESPONSE_DELETE_USER);
-
-        return response;
+    public StaffEntity getStaff(Long idEmpleado) {
+        return staffRepository.findById(idEmpleado).orElse(null);
     }
 
+    public void deleteStaff(Long idEmpleado) {
+        staffRepository.deleteById(idEmpleado);
+    }
 
-    // CONSULTA POR CARGO O POR FECHAS
-
-    public List<StaffResponseDTO> listarStaff(String charge, LocalDate startDate, LocalDate endDate){
-    if (charge != null && !charge.isEmpty() && startDate != null && endDate != null){
-        // Filtro combinado: cargo + fechas
-        return jdbctemplate.query(
-            StaffRepository.GET_STAFF_BY_CHARGE_AND_DATE_RANGE,
-            staffMapper,
-            charge,
-            java.sql.Date.valueOf(startDate),
-            java.sql.Date.valueOf(endDate)
-        );
-    } else if (charge != null && !charge.isEmpty()){
-        // Solo cargo
-        return jdbctemplate.query(
-            StaffRepository.GET_STAFF_BY_CHARGE,
-            staffMapper,
-            charge
-        );
-    } else if (startDate != null && endDate != null){
-        // Solo fechas
-        return jdbctemplate.query(
-            StaffRepository.GET_STAFF_BY_DATE_RANGE,
-            staffMapper,
-            java.sql.Date.valueOf(startDate),
-            java.sql.Date.valueOf(endDate)
-        );
-    } else {
-        // Sin filtros
-        return jdbctemplate.query(
-            StaffRepository.GET_STAFFS,
-            staffMapper
-        );
+    public List<StaffEntity> listarStaff(String charge, LocalDate startDate, LocalDate endDate) {
+        if (charge != null && !charge.isEmpty() && startDate != null && endDate != null) {
+            return staffRepository.findByChargeAndHireDateBetween(charge, startDate, endDate);
+        } else if (charge != null && !charge.isEmpty()) {
+            return staffRepository.findByCharge(charge);
+        } else if (startDate != null && endDate != null) {
+            return staffRepository.findByHireDateBetween(startDate, endDate);
+        }
+        return staffRepository.findAll();
     }
 }
 
-
-    }
 
 
     

@@ -1,93 +1,54 @@
 package com.groupadso.mini_market.Controllers;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import java.util.List;
 
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.groupadso.mini_market.DTO.MessageResponseDTO;
-import com.groupadso.mini_market.DTO.StaffRequestDTO;
-import com.groupadso.mini_market.DTO.StaffResponseDTO;
 import com.groupadso.mini_market.Services.StaffService;
-import org.springframework.web.bind.annotation.RequestParam;
+import com.groupadso.mini_market.Entity.StaffEntity;
+import com.groupadso.mini_market.Constants.MessageConstanst;
 
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/staff")
 public class StaffController {
-    
+
     private final StaffService staffService;
 
-    public StaffController(StaffService staffService){
+    public StaffController(StaffService staffService) {
         this.staffService = staffService;
     }
 
-@PostMapping
-// Se agrega @Valid para activar la validación de los objetos StaffRequestDTO
-public ResponseEntity<List<StaffResponseDTO>> createStaff(@RequestBody @jakarta.validation.Valid List<StaffRequestDTO> staffList){
-    List<StaffResponseDTO> responses = new ArrayList<>();
-    for (StaffRequestDTO staff : staffList){
-        responses.add(staffService.createStaff(staff));
+    @PostMapping
+    public ResponseEntity<String> createStaff(@RequestBody @Valid StaffEntity staff) {
+        staffService.createStaff(staff);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                                .body(MessageConstanst.MESSAGE_RESPONSE_CREATE_USER);
     }
-    return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-}
 
+    @PutMapping("/{idEmpleado}")
+    public ResponseEntity<String> updateStaff(@PathVariable Long idEmpleado,
+                                            @RequestBody @Valid StaffEntity staff) {
+        staffService.updateStaff(idEmpleado, staff);
+        return ResponseEntity.ok(MessageConstanst.MESSAGE_RESPONSE_UPDATE_USER);
+    }
 
-@PutMapping("/{idEmpleado}")
-public ResponseEntity<StaffResponseDTO> updateStaff(
-        @PathVariable("idEmpleado") Long idEmpleado,
-        @RequestBody @jakarta.validation.Valid StaffRequestDTO staffRequestDTO) {
-    
-    StaffResponseDTO response = staffService.updateStaff(idEmpleado, staffRequestDTO);
-    return ResponseEntity.status(HttpStatus.OK).body(response);
-}
-
-
-
-    @GetMapping()
-
-    public ResponseEntity<List<StaffResponseDTO>> getStaff(){
-        List<StaffResponseDTO> response = staffService.getStaff();
-
-        return ResponseEntity.status(HttpStatus.FOUND).body(response);
+    @GetMapping
+    public ResponseEntity<List<StaffEntity>> getStaff() {
+        return ResponseEntity.ok(staffService.getStaff());
     }
 
     @GetMapping("/{idEmpleado}")
-    public ResponseEntity<StaffResponseDTO> getStaff(@PathVariable ("idEmpleado") Long idEmpleado){
-        StaffResponseDTO response = staffService.getStaff(idEmpleado);
-        return ResponseEntity.status(HttpStatus.FOUND).body(response);
-
+    public ResponseEntity<StaffEntity> getStaff(@PathVariable Long idEmpleado) {
+        return ResponseEntity.ok(staffService.getStaff(idEmpleado));
     }
 
     @DeleteMapping("/{idEmpleado}")
-
-    public ResponseEntity<MessageResponseDTO> deleteStaff(@PathVariable Long idEmpleado){
-        MessageResponseDTO response = staffService.deleteStaff(idEmpleado);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<String> deleteStaff(@PathVariable Long idEmpleado) {
+        staffService.deleteStaff(idEmpleado);
+        return ResponseEntity.ok(MessageConstanst.MESSAGE_RESPONSE_DELETE_USER);
     }
-
-    @GetMapping("/filter")
-public ResponseEntity<List<StaffResponseDTO>> listarStaff(
-        @RequestParam(required = false) String charge,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-
-    List<StaffResponseDTO> response = staffService.listarStaff(charge, startDate, endDate);
-    return ResponseEntity.ok(response);
-}
-
-
-    
 }
