@@ -2,15 +2,10 @@ package com.groupadso.mini_market.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.groupadso.mini_market.DTO.EntradaAlmacenResponseDTO;
+import com.groupadso.mini_market.DTO.EntradaAlmacenRequestDTO;
 import com.groupadso.mini_market.Service.WarehouseService;
-
-
 
 @RestController
 @RequestMapping("/warehouse")
@@ -20,14 +15,18 @@ public class WarehouseController {
     private WarehouseService warehouseService;
 
     @PostMapping("/entrada")
-    public ResponseEntity<String> entradaAlmacen(@RequestBody EntradaAlmacenResponseDTO request) {
-        boolean resultado = warehouseService.entradaAlmacen(request.getIdProduct(), request.getIdProveedor(), request.getCantidad());
+    public ResponseEntity<String> entradaAlmacen(@RequestBody EntradaAlmacenRequestDTO request) {
+        boolean resultado = warehouseService.entradaAlmacen(
+                request.getIdProduct(),
+                request.getIdProveedor(),
+                request.getCantidad()
+        );
+
         if (resultado) {
-            return ResponseEntity.ok("Stock actualizado correctamente");
+            return ResponseEntity.ok("Entrada registrada y stock actualizado correctamente");
         } else {
-            return ResponseEntity.badRequest().body("Error al actualizar el stock");
+            return ResponseEntity.badRequest().body("Error al registrar la entrada");
         }
     }
 }
-
 

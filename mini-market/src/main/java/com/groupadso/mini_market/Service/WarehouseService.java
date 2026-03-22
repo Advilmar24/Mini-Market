@@ -1,50 +1,48 @@
 package com.groupadso.mini_market.Service;
 
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import com.groupadso.mini_market.Repository.ProductRepository;
+import com.groupadso.mini_market.Repository.ProveedorRepository;
+import com.groupadso.mini_market.Repository.EntradaProveedorRepository;
+import com.groupadso.mini_market.Entity.ProductEntity;
+import com.groupadso.mini_market.Entity.ProveedorEntity;
+import com.groupadso.mini_market.Entity.EntradaProveedorEntity;
 
 @Service
 public class WarehouseService {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final ProductRepository productRepository;
+    private final ProveedorRepository proveedorRepository;
+    private final EntradaProveedorRepository entradaProveedorRepository;
 
-    public WarehouseService(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public WarehouseService(ProductRepository productRepository,
+                            ProveedorRepository proveedorRepository,
+                            EntradaProveedorRepository entradaProveedorRepository) {
+        this.productRepository = productRepository;
+        this.proveedorRepository = proveedorRepository;
+        this.entradaProveedorRepository = entradaProveedorRepository;
     }
 
     public boolean entradaAlmacen(Long idProduct, Long idProveedor, Integer cantidad) {
         try {
-            // Verificar si el producto existe y obtener el stock actual
-            Integer stockActual = jdbcTemplate.queryForObject(
-                "SELECT cantidad FROM products WHERE idProduct = ?",
-                Integer.class,
-                idProduct
-            );
+            ProductEntity producto = productRepository.findById(idProduct)
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-            if (stockActual == null) {
-                return false; // Producto no encontrado
-            }
+            ProveedorEntity proveedor = proveedorRepository.findById(idProveedor)
+                    .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
 
-            jdbcTemplate.update(
-            "INSERT INTO entradas_proveedor (idProduct, idProveedor, cantidad) VALUES (?,?,?)",
-            idProduct, idProveedor, cantidad
-        );
+            EntradaProveedorEntity entrada = new EntradaProveedorEntity();
+            entrada.setProducto(producto);
+            entrada.setProveedor(proveedor);
+            entrada.setCantidad(cantidad);
+            entradaProveedorRepository.save(entrada);
 
+            producto.setCantidad(producto.getCantidad() + cantidad);
+            productRepository.save(producto);
 
-
-            // Sumar la cantidad al stock actual
-            Integer nuevoStock = stockActual + cantidad;
-
-            // Actualizar el stock en la base de datos
-            int filasAfectadas = jdbcTemplate.update(
-                "UPDATE products SET cantidad = ? WHERE idProduct = ?",
-                nuevoStock,
-                idProduct
-            );
-
-            return filasAfectadas > 0;
+            return true;
         } catch (Exception e) {
-            return false; // Error en la operación
+            return false;
         }
     }
 }

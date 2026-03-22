@@ -17,9 +17,3 @@ server:
     servlet:
       context-path: /api/v1/micro_market
 
-
-loggin: # sección de logs
-  level: # niveles de logs
-    org.springframework.web: DEBUG # Logs detallados para web
-    org.springframework.jdbc.core.JdbcTemplate: DEBUG # Muestra queries SQL
-    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
