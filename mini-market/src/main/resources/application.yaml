@@ -16,3 +16,4 @@ server:
     port: 9090
     servlet:
       context-path: /api/v1/micro_market
+
