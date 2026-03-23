@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.3</version>
+		<version>4.0.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.groupadso</groupId>
 	<artifactId>mini-market</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>mini-market</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Trabajo de Springboot SENA</description>
 	<url/>
 	<licenses>
 		<license/>
