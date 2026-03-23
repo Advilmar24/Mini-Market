@@ -1,4 +1,4 @@
-package com.groupadso.mini_market.entity;
+package com.groupadso.mini_market.Entity;
 
 import java.util.List;
 
@@ -11,6 +11,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import com.groupadso.mini_market.Entity.ProductEntity;
 
 @Entity
 @Table(name = "category")
@@ -27,6 +29,6 @@ public class Category {
     private String name;
 
     @OneToMany(mappedBy = "category")
-    private List<Products> products;
+    private List<ProductEntity> products;
 
 }

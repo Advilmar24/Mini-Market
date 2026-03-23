@@ -1,4 +1,4 @@
-package com.groupadso.mini_market.dto.ResponseDTO;
+package com.groupadso.mini_market.DTO.ResponseDTO;
 
 import lombok.Data;
 

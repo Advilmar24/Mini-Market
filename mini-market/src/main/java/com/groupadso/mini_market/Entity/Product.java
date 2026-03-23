@@ -1,4 +1,4 @@
-package com.groupadso.mini_market.entity;
+package com.groupadso.mini_market.Entity;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +15,7 @@ import lombok.Data;
 @Entity
 @Table(name = "products")
 @Data
-public class Products {
+public class Product {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     @Column (name = "idProduct")

@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.groupadso.mini_market.dto.RequestDTO.ProductsRequestDTO;
-import com.groupadso.mini_market.dto.ResponseDTO.HttpGlobalResponse;
-import com.groupadso.mini_market.dto.ResponseDTO.MessageResponseDTO;
-import com.groupadso.mini_market.dto.ResponseDTO.ProductsResponseDTO;
-import com.groupadso.mini_market.service.ProductsService;
+import com.groupadso.mini_market.DTO.RequestDTO.ProductsRequestDTO;
+import com.groupadso.mini_market.DTO.ResponseDTO.HttpGlobalResponse;
+import com.groupadso.mini_market.DTO.ResponseDTO.MessageResponseDTO;
+import com.groupadso.mini_market.DTO.ResponseDTO.ProductsResponseDTO;
+import com.groupadso.mini_market.Service.ProductsService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +35,7 @@ public class ProductController {
             response.add(productsService.createProduct(productRequest));
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-         
+        
     }
 
     @GetMapping
