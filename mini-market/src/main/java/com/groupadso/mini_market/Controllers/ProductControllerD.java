@@ -1,4 +1,4 @@
-package com.groupadso.mini_market.controller;
+package com.groupadso.mini_market.Controllers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
-public class ProductController {
+public class ProductControllerD {
     private final ProductsService productsService;
 
     @PostMapping

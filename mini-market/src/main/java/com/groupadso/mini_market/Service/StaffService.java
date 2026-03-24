@@ -1,4 +1,4 @@
-package com.groupadso.mini_market.Services;
+package com.groupadso.mini_market.Service;
 
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;

@@ -7,16 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.groupadso.mini_market.DTO.HttpGlobalResponse;
-import com.groupadso.mini_market.DTO.MessageResponseDTO;
+import com.groupadso.mini_market.DTO.MessageResponseSalesDTO;
 import com.groupadso.mini_market.DTO.SalesRequestDTO;
 import com.groupadso.mini_market.DTO.SalesResponseDTO;
 import com.groupadso.mini_market.DTO.SalesDetailRequestDTO;
-import com.groupadso.mini_market.Entity.Personal;
-import com.groupadso.mini_market.Entity.Product;
-import com.groupadso.mini_market.Entity.Sales;
-import com.groupadso.mini_market.Entity.SalesDetail;
-import com.groupadso.mini_market.Exception.InsufficientStockException;
-import com.groupadso.mini_market.Repository.PersonalRepository;
+import com.groupadso.mini_market.Entity.StaffEntity;
+import com.groupadso.mini_market.Entity.ProductEntity;
+import com.groupadso.mini_market.Entity.SalesEntity;
+import com.groupadso.mini_market.Entity.SalesDetailEntity;
+import com.groupadso.mini_market.exception.InsufficientStockException;
+import com.groupadso.mini_market.Repository.StaffRepository;
 import com.groupadso.mini_market.Repository.ProductRepository;
 import com.groupadso.mini_market.Repository.SalesDetailRepository;
 import com.groupadso.mini_market.Repository.SalesRepository;
@@ -28,16 +28,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SalesService {
   private final SalesRepository salesRepository;
-  private final PersonalRepository PersonalRepository;
+  private final StaffRepository staffRepository;
   private final ProductRepository productRepository;
   private final SalesDetailRepository salesDetailRepository;
 
   // @Transactional asegura que si ocurre un error (Regla 2), todas las operaciones
   // realizadas en base de datos (como la resta de stock) se reviertan.
   @Transactional
-  public MessageResponseDTO createSales(SalesRequestDTO request) {
-    MessageResponseDTO response = new MessageResponseDTO();
-    Sales sales = new Sales();
+  public MessageResponseSalesDTO createSales(SalesRequestDTO request) {
+    MessageResponseSalesDTO response = new MessageResponseSalesDTO();
+    SalesEntity sales = new SalesEntity();
     sales.setDate(request.getDate());
     
     // Relación Obligatoria: Validar Empleado
@@ -45,11 +45,11 @@ public class SalesService {
       throw new IllegalArgumentException("El ID del empleado es obligatorio para realizar una venta.");
     }
     
-    Personal personal = PersonalRepository.findById(request.getEmployeeId())
+    StaffEntity staff = staffRepository.findById(request.getEmployeeId())
         .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con id: " + request.getEmployeeId()));
     
     // Vincular la venta al empleado
-    sales.setEmployee(personal);
+    sales.setEmployee(staff);
     // Establecer total inicial temporal
     sales.setTotal(0.0);
     
@@ -60,28 +60,28 @@ public class SalesService {
     
     if (request.getDetails() != null && !request.getDetails().isEmpty()) {
       for (SalesDetailRequestDTO detailDto : request.getDetails()) {
-        Product product = productRepository.findById(detailDto.getIdProduct())
+        ProductEntity product = productRepository.findById(detailDto.getIdProduct())
             .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con id: " + detailDto.getIdProduct()));
         
         // Regla de Negocio 2: Si no tiene stock suficiente, retorna error y cancela transacción
-        if (product.getStock() < detailDto.getCantidad()) {
-          throw new InsufficientStockException("Stock insuficiente para el producto: " + product.getName() + ". Stock disponible: " + product.getStock());
+        if (product.getQuantity() < detailDto.getCantidad()) {
+          throw new InsufficientStockException("Stock insuficiente para el producto: " + product.getName() + ". Stock disponible: " + product.getQuantity());
         }
         
         // Regla de Negocio 1: Restar automáticamente la cantidad vendida del stock
-        product.setStock(product.getStock() - detailDto.getCantidad());
+        product.setQuantity(product.getQuantity() - detailDto.getCantidad());
         productRepository.save(product);
         
         // Guardar el Detalle de Venta
-        SalesDetail detail = new SalesDetail();
+        SalesDetailEntity detail = new SalesDetailEntity();
         detail.setSale(sales);
         detail.setProduct(product);
-        detail.setQuantity(detailDto.getCantidad());
-        detail.setSubtotal(product.getPrice() * detailDto.getCantidad());
+        detail.setAmount(detailDto.getCantidad());
+        detail.setUnitPrice(product.getPrice() * detailDto.getCantidad());
         
         salesDetailRepository.save(detail); // Guardamos el detalle en BD
         
-        totalCalculado += detail.getSubtotal();
+        totalCalculado += detail.getUnitPrice();
       }
     }
     
@@ -96,13 +96,13 @@ public class SalesService {
   public HttpGlobalResponse<List<SalesResponseDTO>> listSales() {
     List<SalesResponseDTO> response = new ArrayList<>();
     HttpGlobalResponse<List<SalesResponseDTO>> responseSales = new HttpGlobalResponse<>();
-    List<Sales> salesList = salesRepository.findAll();
+    List<SalesEntity> salesList = salesRepository.findAll();
 
     if (salesList.isEmpty()) {
       throw new RuntimeException("No hay facturas para mostrar.");
     } 
 
-    for (Sales sold : salesList) {
+    for (SalesEntity sold : salesList) {
       SalesResponseDTO show = new SalesResponseDTO();
       show.setId(sold.getId());
       show.setDate(sold.getDate());
@@ -116,16 +116,16 @@ public class SalesService {
     return responseSales;
   }
 
-  public MessageResponseDTO deleteSale(long id) {
+  public MessageResponseSalesDTO deleteSale(long id) {
     if(!salesRepository.existsById(id)) {
       throw new RuntimeException("Venta no encontrada");
     }
     salesRepository.deleteById(id);
-    return new MessageResponseDTO("Venta eliminada exitosamente");
+    return new MessageResponseSalesDTO("Venta eliminada exitosamente");
   }
 
-  public MessageResponseDTO updateSale(Long id, SalesRequestDTO request) {
-    Sales sale = salesRepository.findById(id)
+  public MessageResponseSalesDTO updateSale(Long id, SalesRequestDTO request) {
+    SalesEntity sale = salesRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Sale not found"));
 
     sale.setDate(request.getDate());
@@ -133,7 +133,7 @@ public class SalesService {
 
     salesRepository.save(sale);
 
-    return new MessageResponseDTO("Venta Actualizada exitosamente");
+    return new MessageResponseSalesDTO("Venta Actualizada exitosamente");
   }
 }
 

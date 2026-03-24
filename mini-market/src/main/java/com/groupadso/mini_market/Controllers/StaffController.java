@@ -5,8 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import java.util.List;
 
-import com.groupadso.mini_market.Services.StaffService;
 import com.groupadso.mini_market.Entity.StaffEntity;
+import com.groupadso.mini_market.Service.StaffService;
 import com.groupadso.mini_market.Constants.MessageConstanst;
 
 

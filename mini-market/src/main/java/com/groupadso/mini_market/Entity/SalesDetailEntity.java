@@ -11,26 +11,27 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "sales_detail")
+@Table(name = "detalle_venta")
 @Data
-public class SalesDetail {
+public class SalesDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idDetalle")
     private Long id;
 
     // Relación Muchos a Uno con Sales (Venta Cabecera)
     @ManyToOne(optional = false)
-    @JoinColumn(name = "sale_id", nullable = false)
-    private Sales sale;
+    @JoinColumn(name = "idVenta", nullable = false)
+    private SalesEntity sale;
 
     // Relación Muchos a Uno con Product (Para descontar stock)
     @ManyToOne(optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "idProduct", nullable = false)
+    private ProductEntity product;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    @Column(name = "amount", nullable = false)
+    private Integer amount;
 
-    @Column(name = "subtotal", nullable = false)
-    private Double subtotal;
+    @Column(name = "unit_price", nullable = false)
+    private Double unitPrice;
 }

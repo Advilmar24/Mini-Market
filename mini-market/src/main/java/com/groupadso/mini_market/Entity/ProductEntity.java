@@ -15,6 +15,7 @@ public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idProduct")
     private Long idProduct;
 
     @NotBlank(message = "El nombre del producto es obligatorio")

@@ -1,4 +1,4 @@
-package com.groupadso.mini_market.Controller;
+package com.groupadso.mini_market.Controllers;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.List;
 
 import com.groupadso.mini_market.DTO.HttpGlobalResponse;
-import com.groupadso.mini_market.DTO.MessageResponseDTO;
+import com.groupadso.mini_market.DTO.MessageResponseSalesDTO;
 import com.groupadso.mini_market.DTO.SalesRequestDTO;
 import com.groupadso.mini_market.DTO.SalesResponseDTO;
 import com.groupadso.mini_market.Service.SalesService;
-import com.groupadso.mini_market.Exception.InsufficientStockException;
+import com.groupadso.mini_market.exception.InsufficientStockException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,11 +36,11 @@ public class SalesController {
 
 
   @PostMapping
-  public ResponseEntity<MessageResponseDTO> createSales(@RequestBody SalesRequestDTO request) {
+  public ResponseEntity<MessageResponseSalesDTO> createSales(@RequestBody SalesRequestDTO request) {
     // Ya no es necesario el try catch si usamos @ExceptionHandler, 
     // pero lo dejaremos para otro tipo de errores generales.
     // La excepción de Stock subirá y será cachada por handleInsufficientStock.
-    MessageResponseDTO response = salesService.createSales(request); 
+    MessageResponseSalesDTO response = salesService.createSales(request); 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
   
@@ -61,52 +61,52 @@ public class SalesController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<MessageResponseDTO> deleteSale(@PathVariable Long id) {
+  public ResponseEntity<MessageResponseSalesDTO> deleteSale(@PathVariable Long id) {
     try {
-      MessageResponseDTO response = salesService.deleteSale(id);
+      MessageResponseSalesDTO response = salesService.deleteSale(id);
       return ResponseEntity.status(HttpStatus.OK).body(response);
   
     } catch (RuntimeException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponseDTO(e.getMessage()));
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponseSalesDTO(e.getMessage()));
 
     } catch (Exception e) {
       e.printStackTrace();
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponseDTO("Error al eliminar la venta"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponseSalesDTO("Error al eliminar la venta"));
 
     }
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<MessageResponseDTO> updateSale(
+  public ResponseEntity<MessageResponseSalesDTO> updateSale(
     @PathVariable Long id,
     @RequestBody SalesRequestDTO request) {
 
   try {
-    MessageResponseDTO response = salesService.updateSale(id, request);
+    MessageResponseSalesDTO response = salesService.updateSale(id, request);
     return ResponseEntity.status(HttpStatus.OK).body(response);
 
   } catch (RuntimeException e) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponseDTO(e.getMessage()));
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponseSalesDTO(e.getMessage()));
 
   } catch (Exception e) {
     e.printStackTrace();
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(new MessageResponseDTO("Error al actualizar la venta"));
+        .body(new MessageResponseSalesDTO("Error al actualizar la venta"));
   }
   }
 
   // ============== MANEJO DE ERRORES CENTRALIZADO EN CONTROLADOR ===============
   // Regla 2: Retornar 400 Bad Request si no hay stock
   @ExceptionHandler(InsufficientStockException.class)
-  public ResponseEntity<MessageResponseDTO> handleInsufficientStock(InsufficientStockException ex) {
-      MessageResponseDTO errorDto = new MessageResponseDTO(ex.getMessage());
+  public ResponseEntity<MessageResponseSalesDTO> handleInsufficientStock(InsufficientStockException ex) {
+      MessageResponseSalesDTO errorDto = new MessageResponseSalesDTO(ex.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
   }
 
   // Excepción extra si el ID de producto o empleado no existe (también retorna 400)
   @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<MessageResponseDTO> handleIllegalArgument(IllegalArgumentException ex) {
-      MessageResponseDTO errorDto = new MessageResponseDTO(ex.getMessage());
+  public ResponseEntity<MessageResponseSalesDTO> handleIllegalArgument(IllegalArgumentException ex) {
+      MessageResponseSalesDTO errorDto = new MessageResponseSalesDTO(ex.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
   }
 }

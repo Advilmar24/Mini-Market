@@ -3,8 +3,9 @@ package com.groupadso.mini_market.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.groupadso.mini_market.Entity.SalesDetail;
+import com.groupadso.mini_market.Entity.SalesEntity;
 
 @Repository
-public interface SalesDetailRepository extends JpaRepository<SalesDetail, Long> {
+public interface SalesRepository extends JpaRepository<SalesEntity, Long> {
+
 }

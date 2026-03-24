@@ -11,14 +11,15 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "sales")
+@Table(name = "ventas")
 @Data
-public class Sales {
+public class SalesEntity {
   @Id 
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "idVenta")
   private Long id;
 
-  @Column(name = "date")
+  @Column(name = "dateHire")
   private String date;
 
   @Column(name = "total")
@@ -26,7 +27,7 @@ public class Sales {
 
   // Relación obligatoria con Empleado (Quien realiza la transacción)
   @ManyToOne(optional = false)
-  @JoinColumn(name = "employee_id", nullable = false)
-  private Personal employee;
+  @JoinColumn(name = "idEmpleado", nullable = false)
+  private StaffEntity employee;
 
 }

@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import com.groupadso.mini_market.Entity.ProductEntity;
+
 
 @Entity
 @Table(name = "category")
@@ -22,7 +22,7 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idCategory")
-    private Long id;
+    private Long idCategory;
 
     @Column(name = "name")
     @NotNull(message = "El nombre de la categoría es obligatorio")

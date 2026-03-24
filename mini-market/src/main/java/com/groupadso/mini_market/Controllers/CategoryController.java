@@ -1,4 +1,4 @@
-package com.groupadso.mini_market.controller;
+package com.groupadso.mini_market.Controllers;
 
 import java.util.List;
 
