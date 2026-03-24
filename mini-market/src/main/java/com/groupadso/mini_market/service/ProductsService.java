@@ -15,7 +15,8 @@ import com.groupadso.mini_market.DTO.ResponseDTO.HttpGlobalResponse;
 import com.groupadso.mini_market.DTO.ResponseDTO.MessageResponseDTO;
 import com.groupadso.mini_market.DTO.ResponseDTO.ProductsResponseDTO;
 import com.groupadso.mini_market.Entity.Category;
-import com.groupadso.mini_market.Entity.Product;
+
+import com.groupadso.mini_market.Entity.ProductEntity;
 import com.groupadso.mini_market.Repository.CategoryRepository;
 import com.groupadso.mini_market.Repository.ProductsRepository;
 
@@ -39,18 +40,18 @@ public class ProductsService {
                     
                 }
 
-        Product products = new Product();
+        ProductEntity products = new ProductEntity  ();
         products.setName(request.getName());
         products.setPrice(request.getPrice());
         products.setQuantity(request.getQuantity());
-        products.setCategory(category);
+        products.setIdCategory(category);
 
         String barcode = generatedBarcode();
 
         products.setBarcode(barcode);
 
         try {
-             productsRepository.save(products);
+            productsRepository.save(products);
         } catch (DataIntegrityViolationException e) {
             throw new RuntimeException("Error, codigo de barra duplicado");
         }
@@ -66,16 +67,16 @@ public class ProductsService {
     public HttpGlobalResponse<List<ProductsResponseDTO>> listProduct(){
         List<ProductsResponseDTO> response = new ArrayList<>();
         HttpGlobalResponse<List<ProductsResponseDTO>> responseProduct = new HttpGlobalResponse<>();
-        List<Product> products = productsRepository.findAll();
+        List<ProductEntity> products = productsRepository.findAll();
 
         if (products.isEmpty()) {
             throw new RuntimeException("No hay productos para mostrar");
         }
 
-        for(Product product : products){
+        for(ProductEntity product : products){
             ProductsResponseDTO item = new ProductsResponseDTO();
 
-            item.setId(product.getId());
+            item.setId(product.getIdProduct());
             item.setName(product.getName());
             item.setPrice(product.getPrice());
             item.setQuantity(product.getQuantity());
@@ -90,10 +91,10 @@ public class ProductsService {
     }
 
     public ProductsResponseDTO getProductById(Long id){
-        Product product = productsRepository.findById(id).orElseThrow(()-> new RuntimeException("Producto no encontrado"));
+        ProductEntity product = productsRepository.findById(id).orElseThrow(()-> new RuntimeException("Producto no encontrado"));
 
         ProductsResponseDTO response = new ProductsResponseDTO();
-        response.setId(product.getId());
+        response.setId(product.getIdProduct());
         response.setName(product.getName());
         response.setPrice(product.getPrice());
         response.setQuantity(product.getQuantity());
@@ -102,7 +103,7 @@ public class ProductsService {
     }
 
     public MessageResponseDTO updateProduct(Long id, ProductsRequestDTO request){
-        Product product = productsRepository.findById(id).orElseThrow(()-> new RuntimeException("Producto no encontrado"));
+        ProductEntity product = productsRepository.findById(id).orElseThrow(()-> new RuntimeException("Producto no encontrado"));
 
         product.setName(request.getName());
         product.setPrice(request.getPrice());
@@ -117,7 +118,7 @@ public class ProductsService {
     }
 
     public MessageResponseDTO deleteProduct(Long id){
-        Product product = productsRepository.findByIdAndStatusTrue(id).orElseThrow(()-> new RuntimeException("Producto no encontrado."));
+        ProductEntity product = productsRepository.findByIdAndStatusTrue(id).orElseThrow(()-> new RuntimeException("Producto no encontrado."));
 
         product.setStatus(false); //BORRADO LOGICO
         product.setDeletedAt(LocalDateTime.now());   
@@ -130,18 +131,18 @@ public class ProductsService {
         return response;
     }
 
-    public CategoryResponseDTO getCategoryById(Long id){
-        Category category = categoryRepository.findById(id).orElseThrow(()-> new RuntimeException("Categoría no encontrada"));
+    public CategoryResponseDTO getCategoryByIdCResponseDTO(Long idCategory){
+        Category category = categoryRepository.findById(idCategory).orElseThrow(()-> new RuntimeException("Categoría no encontrada"));
 
         CategoryResponseDTO response = new CategoryResponseDTO();
-        response.setId(category.getId());
+        response.setId(category.getIdCategory());
         response.setName(category.getName());
 
         List<ProductsResponseDTO> productsDTO =new ArrayList<>();
 
-        for (Product products : category.getProducts()){
+        for (ProductEntity products : category.getProducts()){
             ProductsResponseDTO dto = new ProductsResponseDTO();
-            dto.setId(products.getId());
+            dto.setId(products.getIdProduct());
             dto.setName(products.getName());
             dto.setPrice(products.getPrice());
             dto.setQuantity(products.getQuantity());
@@ -157,16 +158,16 @@ public class ProductsService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + categoryId));
 
-        List<Product> productsList = productsRepository.findByCategory(category);
+        List<ProductEntity> productsList = productsRepository.findByCategory(category);
 
         if (productsList.isEmpty()) {
             throw new RuntimeException("No hay productos en esta categoría");
         }
 
         List<ProductsResponseDTO> response = new ArrayList<>();
-        for (Product product : productsList) {
+        for (ProductEntity product : productsList) {
             ProductsResponseDTO dto = new ProductsResponseDTO();
-            dto.setId(product.getId());
+            dto.setId(product.getIdProduct());
             dto.setName(product.getName());
             dto.setPrice(product.getPrice());
             dto.setQuantity(product.getQuantity());

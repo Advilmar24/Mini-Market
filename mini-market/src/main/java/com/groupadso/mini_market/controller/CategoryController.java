@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.groupadso.mini_market.dto.RequestDTO.CategoryRequestDTO;
-import com.groupadso.mini_market.dto.ResponseDTO.CategoryResponseDTO;
-import com.groupadso.mini_market.dto.ResponseDTO.HttpGlobalResponse;
-import com.groupadso.mini_market.dto.ResponseDTO.MessageResponseDTO;
-import com.groupadso.mini_market.dto.ResponseDTO.ProductsResponseDTO;
-import com.groupadso.mini_market.service.ProductsService;
+import com.groupadso.mini_market.DTO.RequestDTO.CategoryRequestDTO;
+import com.groupadso.mini_market.DTO.ResponseDTO.CategoryResponseDTO;
+import com.groupadso.mini_market.DTO.ResponseDTO.HttpGlobalResponse;
+import com.groupadso.mini_market.DTO.ResponseDTO.MessageResponseDTO;
+import com.groupadso.mini_market.DTO.ResponseDTO.ProductsResponseDTO;
+import com.groupadso.mini_market.Service.ProductsService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<HttpGlobalResponse<CategoryResponseDTO>> getCategory(@PathVariable Long id) {
         HttpGlobalResponse<CategoryResponseDTO> response = new HttpGlobalResponse<>();
-        CategoryResponseDTO data = productsService.getCategoryById(id);
+        CategoryResponseDTO data = productsService.getCategoryByIdCResponseDTO(id);
         response.setMessage("Categoría encontrada");
         response.setData(data);
         return ResponseEntity.status(HttpStatus.OK).body(response);

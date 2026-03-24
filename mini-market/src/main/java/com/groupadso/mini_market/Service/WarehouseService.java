@@ -37,7 +37,7 @@ public class WarehouseService {
             entrada.setCantidad(cantidad);
             entradaProveedorRepository.save(entrada);
 
-            producto.setCantidad(producto.getCantidad() + cantidad);
+            producto.setQuantity(producto.getQuantity() + cantidad);
             productRepository.save(producto);
 
             return true;

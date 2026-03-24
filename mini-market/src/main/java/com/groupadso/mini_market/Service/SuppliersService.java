@@ -3,7 +3,8 @@ package com.groupadso.mini_market.Service;
 import com.groupadso.mini_market.DTO.MessageResponseDTO;
 import com.groupadso.mini_market.DTO.SuppliersRequestDTO;
 import com.groupadso.mini_market.DTO.SuppliersResponseDTO;
-import com.groupadso.mini_market.Entity.ProveedorEntity;
+
+import com.groupadso.mini_market.Entity.SuppliersEntity;
 import com.groupadso.mini_market.Repository.SuppliersRepository;
 import com.groupadso.mini_market.Constants.MessageConstants;
 
@@ -22,20 +23,20 @@ public class SuppliersService {
     }
 
     public SuppliersResponseDTO createSupplier(SuppliersRequestDTO dto) {
-        ProveedorEntity proveedor = new ProveedorEntity();
+        SuppliersEntity proveedor = new SuppliersEntity();
         proveedor.setName(dto.getName());
         proveedor.setNit(dto.getNit());
         proveedor.setPhone(dto.getPhone());
         proveedor.setMail(dto.getMail());
         proveedor.setAddress(dto.getAddress());
 
-        ProveedorEntity saved = suppliersRepository.save(proveedor);
+        SuppliersEntity saved = suppliersRepository.save(proveedor);
 
         return mapToResponse(saved);
     }
 
     public SuppliersResponseDTO updateSupplier(Long idProveedor, SuppliersRequestDTO dto) {
-        ProveedorEntity proveedor = suppliersRepository.findById(idProveedor)
+        SuppliersEntity proveedor = suppliersRepository.findById(idProveedor)
                 .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
 
         proveedor.setName(dto.getName());
@@ -43,7 +44,7 @@ public class SuppliersService {
         proveedor.setMail(dto.getMail());
         proveedor.setAddress(dto.getAddress());
 
-        ProveedorEntity updated = suppliersRepository.save(proveedor);
+        SuppliersEntity updated = suppliersRepository.save(proveedor);
 
         return mapToResponse(updated);
     }
@@ -56,7 +57,7 @@ public class SuppliersService {
     }
 
     public SuppliersResponseDTO getSupplier(Long idProveedor) {
-        ProveedorEntity proveedor = suppliersRepository.findById(idProveedor)
+        SuppliersEntity proveedor = suppliersRepository.findById(idProveedor)
                 .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
         return mapToResponse(proveedor);
     }
@@ -69,7 +70,7 @@ public class SuppliersService {
         return response;
     }
 
-    private SuppliersResponseDTO mapToResponse(ProveedorEntity proveedor) {
+    private SuppliersResponseDTO mapToResponse(SuppliersEntity proveedor) {
         SuppliersResponseDTO dto = new SuppliersResponseDTO();
         dto.setIdProveedor(proveedor.getIdProveedor());
         dto.setName(proveedor.getName());

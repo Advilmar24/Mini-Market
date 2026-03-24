@@ -1,14 +1,17 @@
 package com.groupadso.mini_market.Controllers;
 
 import com.groupadso.mini_market.Entity.ProductEntity;
-import com.groupadso.mini_market.Entity.ProveedorEntity;
+
 import com.groupadso.mini_market.Repository.ProductRepository;
 import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
@@ -31,26 +34,34 @@ public class ProductController {
 
     // READ ONE
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProduct(@PathVariable Long id) {
-        return productRepository.findById(id)
-                .map(product -> ResponseEntity.ok(product))
-                .orElse(ResponseEntity.badRequest().body("Producto no encontrado"));
+public ResponseEntity<?> getProduct(@PathVariable Long id) {
+    Optional<ProductEntity> optional = productRepository.findById(id);
+
+    if (optional.isPresent()) {
+        return ResponseEntity.ok(optional.get());
+    } else {
+        return ResponseEntity.badRequest().body("Producto no encontrado");
     }
+}
 
     // UPDATE
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductEntity product) {
-        return productRepository.findById(id)
-                .map(existing -> {
-                    existing.setName(product.getName());
-                    existing.setPrice(product.getPrice());
-                    existing.setCantidad(product.getCantidad());
-                    existing.setProveedor(product.getProveedor());
-                    ProductEntity updated = productRepository.save(existing);
-                    return ResponseEntity.ok(updated);
-                })
-                .orElse(ResponseEntity.badRequest().body("Producto no encontrado"));
+public ResponseEntity<?> updateProduct(@PathVariable Long idProduct, @Valid @RequestBody ProductEntity product) {
+    Optional<ProductEntity> optional = productRepository.findById(idProduct);
+
+    if (optional.isPresent()) {
+        ProductEntity existing = optional.get();
+        existing.setName(product.getName());
+        existing.setPrice(product.getPrice());
+        existing.setQuantity(product.getQuantity());
+        existing.setProveedor(product.getProveedor());
+        existing.setIdCategory(product.getIdCategory());
+        ProductEntity updated = productRepository.save(existing);
+        return ResponseEntity.ok(updated);
+    } else {
+        return ResponseEntity.badRequest().body("Producto no encontrado");
     }
+}
 
     // DELETE
     @DeleteMapping("/{id}")
