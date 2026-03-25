@@ -5,6 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import com.groupadso.mini_market.Entity.SalesDetailEntity;
 
+
+
 @Repository
 public interface SalesDetailRepository extends JpaRepository<SalesDetailEntity, Long> {
 }
+

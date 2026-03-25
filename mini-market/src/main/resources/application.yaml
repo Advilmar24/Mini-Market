@@ -1,7 +1,10 @@
 spring:
   application:
-<<<<<<< HEAD
     name: micro_market
+
+  devtools:
+    restart:
+      enabled: false
 
   datasource:
     url: jdbc:mysql://localhost:3306/micro_market
@@ -21,25 +24,6 @@ spring:
         format-sql: true
 
 server:
-  port: 8484
+  port: ${SERVER_PORT:8585}
   servlet:
-    context-path: /api/v1/micro_market  
-=======
-    name: mini-market
-
-  
-  # conexion a la base de datos
-  datasource:
-    url: jdbc:mysql://localhost:3306/micro_market
-    username: root
-    password: 1005367136md
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-
-  #configuracion del puerto
-server:
-    port: 9090
-    servlet:
-      context-path: /api/v1/micro_market
-
->>>>>>> origin/develop
+    context-path: /api/v1/micro_market

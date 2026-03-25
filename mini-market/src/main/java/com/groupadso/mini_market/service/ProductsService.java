@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.groupadso.mini_market.DTO.RequestDTO.CategoryRequestDTO;
 import com.groupadso.mini_market.DTO.RequestDTO.ProductsRequestDTO;
@@ -17,45 +18,63 @@ import com.groupadso.mini_market.DTO.ResponseDTO.ProductsResponseDTO;
 import com.groupadso.mini_market.Entity.Category;
 
 import com.groupadso.mini_market.Entity.ProductEntity;
+import com.groupadso.mini_market.Entity.ProveedorEntity;
 import com.groupadso.mini_market.Repository.CategoryRepository;
 import com.groupadso.mini_market.Repository.ProductsRepository;
-
-import lombok.RequiredArgsConstructor;
+import com.groupadso.mini_market.Repository.ProveedorRepository;
 
 @Service
-@RequiredArgsConstructor
 public class ProductsService {
+
     private final ProductsRepository productsRepository;
     private final CategoryRepository categoryRepository;
+    private final ProveedorRepository proveedorRepository;
 
-    public MessageResponseDTO createProduct(ProductsRequestDTO request){
+    public ProductsService(
+            ProductsRepository productsRepository,
+            CategoryRepository categoryRepository,
+            ProveedorRepository proveedorRepository) {
+        this.productsRepository = productsRepository;
+        this.categoryRepository = categoryRepository;
+        this.proveedorRepository = proveedorRepository;
+    }
+
+    public MessageResponseDTO createProduct(ProductsRequestDTO request) {
+         System.out.println("=== DEBUG REQUEST ===");
+        System.out.println("name: " + request.getName());
+        System.out.println("price: " + request.getPrice());
+        System.out.println("quantity: " + request.getQuantity());
+        System.out.println("categoryId: " + request.getCategoryId());
+        System.out.println("idProveedor: " + request.getIdProveedor());
+        System.out.println("====================");
         MessageResponseDTO response = new MessageResponseDTO();
 
-        // Validar que la categoría exista
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + request.getCategoryId()));
 
-                if (productsRepository.existsByNameIgnoreCaseAndCategory(request.getName().trim(), category)) {
-                    throw new RuntimeException("Ya existe un producto con el mismo nombre en esta categoría");
-                    
-                }
+        ProveedorEntity proveedor = proveedorRepository.findById(request.getIdProveedor())
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con id: " + request.getIdProveedor()));
 
-        ProductEntity products = new ProductEntity  ();
-        products.setName(request.getName());
-        products.setPrice(request.getPrice());
-        products.setQuantity(request.getQuantity());
-        products.setIdCategory(category);
+        if (productsRepository.existsByNameIgnoreCaseAndCategory(request.getName().trim(), category)) {
+            throw new RuntimeException("Ya existe un producto con el mismo nombre en esta categoría");
+        }
+
+        ProductEntity newProduct = new ProductEntity();
+        newProduct.setName(request.getName());
+        newProduct.setPrice(request.getPrice());
+        newProduct.setQuantity(request.getQuantity());
+        newProduct.setCategory(category);
+        newProduct.setProveedor(proveedor);
 
         String barcode = generatedBarcode();
-
-        products.setBarcode(barcode);
+        newProduct.setBarcode(barcode);
 
         try {
-            productsRepository.save(products);
+            productsRepository.save(newProduct);
         } catch (DataIntegrityViolationException e) {
             throw new RuntimeException("Error, codigo de barra duplicado");
         }
-        
+
         response.setMessage("Producto creado correctamente. Barcode " + barcode);
         return response;
     }
@@ -118,7 +137,7 @@ public class ProductsService {
     }
 
     public MessageResponseDTO deleteProduct(Long id){
-        ProductEntity product = productsRepository.findByIdAndStatusTrue(id).orElseThrow(()-> new RuntimeException("Producto no encontrado."));
+        ProductEntity product = productsRepository.findByIdProductAndStatusTrue(id).orElseThrow(()-> new RuntimeException("Producto no encontrado."));
 
         product.setStatus(false); //BORRADO LOGICO
         product.setDeletedAt(LocalDateTime.now());   
@@ -131,23 +150,23 @@ public class ProductsService {
         return response;
     }
 
-    public CategoryResponseDTO getCategoryByIdCResponseDTO(Long idCategory){
+    @Transactional(readOnly = true)
+    public CategoryResponseDTO getCategoryByIdCResponseDTO(Long idCategory) {
         Category category = categoryRepository.findById(idCategory).orElseThrow(()-> new RuntimeException("Categoría no encontrada"));
 
         CategoryResponseDTO response = new CategoryResponseDTO();
         response.setId(category.getIdCategory());
         response.setName(category.getName());
 
-        List<ProductsResponseDTO> productsDTO =new ArrayList<>();
+        List<ProductsResponseDTO> productsDTO = new ArrayList<>();
 
-        for (ProductEntity products : category.getProducts()){
+        for (ProductEntity p : category.getProducts()) {
             ProductsResponseDTO dto = new ProductsResponseDTO();
-            dto.setId(products.getIdProduct());
-            dto.setName(products.getName());
-            dto.setPrice(products.getPrice());
-            dto.setQuantity(products.getQuantity());
-            dto.setBarcode(products.getBarcode());
-
+            dto.setId(p.getIdProduct());
+            dto.setName(p.getName());
+            dto.setPrice(p.getPrice());
+            dto.setQuantity(p.getQuantity());
+            dto.setBarcode(p.getBarcode());
             productsDTO.add(dto);
         }
         response.setProducts(productsDTO);

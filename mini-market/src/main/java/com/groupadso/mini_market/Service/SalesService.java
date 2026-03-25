@@ -58,8 +58,11 @@ public class SalesService {
     
     double totalCalculado = 0.0;
     
-    if (request.getDetails() != null && !request.getDetails().isEmpty()) {
-      for (SalesDetailRequestDTO detailDto : request.getDetails()) {
+    if (request.getDetails() == null || request.getDetails().isEmpty()) {
+      throw new IllegalArgumentException("La venta debe incluir al menos un producto en details.");
+    }
+
+    for (SalesDetailRequestDTO detailDto : request.getDetails()) {
         ProductEntity product = productRepository.findById(detailDto.getIdProduct())
             .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con id: " + detailDto.getIdProduct()));
         
@@ -82,7 +85,6 @@ public class SalesService {
         salesDetailRepository.save(detail); // Guardamos el detalle en BD
         
         totalCalculado += detail.getUnitPrice();
-      }
     }
     
     // Actualizamos el total de la cabecera con el cálculo real

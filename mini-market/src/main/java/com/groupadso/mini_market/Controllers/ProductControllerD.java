@@ -20,6 +20,7 @@ import com.groupadso.mini_market.DTO.ResponseDTO.MessageResponseDTO;
 import com.groupadso.mini_market.DTO.ResponseDTO.ProductsResponseDTO;
 import com.groupadso.mini_market.Service.ProductsService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,7 +30,7 @@ public class ProductControllerD {
     private final ProductsService productsService;
 
     @PostMapping
-    public ResponseEntity <List<MessageResponseDTO>> createProduct (@RequestBody List<ProductsRequestDTO> request){
+    public ResponseEntity <List<MessageResponseDTO>> createProduct (@RequestBody @Valid List<ProductsRequestDTO> request){
         List<MessageResponseDTO> response = new ArrayList<>();
         for (ProductsRequestDTO productRequest : request) {
             response.add(productsService.createProduct(productRequest));

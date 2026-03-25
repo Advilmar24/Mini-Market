@@ -13,6 +13,7 @@ import com.groupadso.mini_market.DTO.SalesResponseDTO;
 import com.groupadso.mini_market.Service.SalesService;
 import com.groupadso.mini_market.exception.InsufficientStockException;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class SalesController {
 
 
   @PostMapping
-  public ResponseEntity<MessageResponseSalesDTO> createSales(@RequestBody SalesRequestDTO request) {
+  public ResponseEntity<MessageResponseSalesDTO> createSales(@Valid @RequestBody SalesRequestDTO request) {
     // Ya no es necesario el try catch si usamos @ExceptionHandler, 
     // pero lo dejaremos para otro tipo de errores generales.
     // La excepción de Stock subirá y será cachada por handleInsufficientStock.
@@ -79,7 +80,7 @@ public class SalesController {
   @PutMapping("/{id}")
   public ResponseEntity<MessageResponseSalesDTO> updateSale(
     @PathVariable Long id,
-    @RequestBody SalesRequestDTO request) {
+    @Valid @RequestBody SalesRequestDTO request) {
 
   try {
     MessageResponseSalesDTO response = salesService.updateSale(id, request);
