@@ -10,6 +10,7 @@ public class SalesRequestDTO {
 
   private Double total;
 
+
   // Se añade obligatoriamente el empleado que hizo la venta
   private Long employeeId;
 
