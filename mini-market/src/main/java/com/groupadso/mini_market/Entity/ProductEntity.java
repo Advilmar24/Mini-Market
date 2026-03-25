@@ -35,19 +35,19 @@ public class ProductEntity {
     @Column(name = "barcode", unique = true, nullable = false)
     private String barcode;
 
-    @ManyToOne
-    @JoinColumn(name = "idProveedor", nullable = false)
-    private ProveedorEntity proveedor;
-
-    @ManyToOne
-    @JoinColumn(name = "idCategory", nullable = false)
-    private Category idCategory;
-
     @Column(name = "status")
     private boolean status = true;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+     @ManyToOne
+    @JoinColumn(name = "idProveedor", nullable = true)
+    private ProveedorEntity proveedor;
+
+    @ManyToOne
+    @JoinColumn(name = "idCategory", nullable = true)
+    private Category category;
 
 
 }

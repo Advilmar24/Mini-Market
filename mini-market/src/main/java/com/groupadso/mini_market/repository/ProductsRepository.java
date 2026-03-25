@@ -13,7 +13,7 @@ import com.groupadso.mini_market.Entity.ProductEntity;
 public interface ProductsRepository extends JpaRepository <ProductEntity, Long> {
 
     List<ProductEntity> findByStatusTrue();
-    Optional<ProductEntity> findByIdAndStatusTrue(Long id);  
+    Optional<ProductEntity> findByIdProductAndStatusTrue(Long idProduct);  
     List<ProductEntity> findByCategoryAndStatusTrue(Category category);
 
     Optional<ProductEntity> findByBarcode(String barcode);
