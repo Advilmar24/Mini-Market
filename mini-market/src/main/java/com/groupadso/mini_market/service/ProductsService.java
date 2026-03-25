@@ -40,6 +40,13 @@ public class ProductsService {
     }
 
     public MessageResponseDTO createProduct(ProductsRequestDTO request) {
+         System.out.println("=== DEBUG REQUEST ===");
+        System.out.println("name: " + request.getName());
+        System.out.println("price: " + request.getPrice());
+        System.out.println("quantity: " + request.getQuantity());
+        System.out.println("categoryId: " + request.getCategoryId());
+        System.out.println("idProveedor: " + request.getIdProveedor());
+        System.out.println("====================");
         MessageResponseDTO response = new MessageResponseDTO();
 
         Category category = categoryRepository.findById(request.getCategoryId())

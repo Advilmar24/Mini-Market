@@ -2,6 +2,7 @@ package com.groupadso.mini_market.DTO.RequestDTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +19,7 @@ public class ProductsRequestDTO {
 
     @NotNull(message = "La cantidad no puede ser nula")
     @Min(value = 0, message = "La cantidad debe ser mayor o igual a 0")
+    @Column(name = "cantidad")
     private int quantity;
 
     @NotNull(message = "La categoría no puede ser nula")
